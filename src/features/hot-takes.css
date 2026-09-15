@@ -1,0 +1,29 @@
+.lbx-take-row + .lbx-take-row {
+  margin-block-start: var(--spacing-medium);
+}
+
+.lbx-take-heading {
+  margin: 0 0 var(--spacing-dense-small);
+  color: var(--theme-metadata-low-contrast-content-color);
+  font-family: var(--font-stack-graphik);
+  font-weight: 400;
+  font-size: 0.625rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.075em;
+}
+
+/* .poster-viewingdata already floats .rating left and clears with overflow,
+   which is how the site right-aligns its own <time>. */
+.lbx-deviation {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lbx-deviation.-hotter {
+  color: var(--theme-brand-green-content-color, #00e054);
+}
+
+.lbx-deviation.-colder {
+  color: var(--theme-brand-orange-content-color, #ff8000);
+}

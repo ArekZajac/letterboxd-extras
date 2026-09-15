@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Letterboxd Profile Extras",
+  "version": "1.0.0",
+  "description": "Adds extra analytics to Letterboxd profile pages.",
+  "permissions": ["storage"],
+  "host_permissions": ["https://letterboxd.com/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://letterboxd.com/*"],
+      "js": ["src/boot.js"],
+      "css": [
+        "src/core/base.css",
+        "src/core/bar-chart.css",
+        "src/core/meter.css",
+        "src/features/ratings.css",
+        "src/features/eras.css",
+        "src/features/log-history.css",
+        "src/features/genres.css",
+        "src/features/hot-takes.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/*.js", "src/*/*.js"],
+      "matches": ["https://letterboxd.com/*"]
+    }
+  ]
+}

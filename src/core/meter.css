@@ -1,0 +1,69 @@
+.lbx-meter-list {
+  --lbx-meter-label-width: 6.5rem;
+  --lbx-meter-bar-height: 0.5rem;
+  /* Set from JS to the widest value in the set, so every bar ends on the same
+     edge instead of the column resizing per row. */
+  --lbx-meter-value-width: 2ch;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-dense-small);
+}
+
+/* The row carries the type size so the `ch` above resolves against the font the
+   values are actually set in. */
+.lbx-meter {
+  display: grid;
+  grid-template-columns: var(--lbx-meter-label-width) 1fr var(--lbx-meter-value-width);
+  align-items: center;
+  gap: var(--spacing-dense-medium);
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  color: var(--lbx-meter-color, var(--theme-fill-color));
+  transition-property: color;
+  transition-duration: var(--transition-duration, var(--timing-duration-out));
+  transition-timing-function: var(--easing-default);
+}
+
+a.lbx-meter:hover {
+  --transition-duration: var(--timing-duration-in);
+  color: var(--lbx-meter-hover-color, var(--theme-fill-hover-color));
+}
+
+a.lbx-meter:focus-visible {
+  outline: var(--focus-outline);
+}
+
+.lbx-meter-label,
+.lbx-meter-value {
+  color: var(--theme-metadata-content-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+a.lbx-meter:hover .lbx-meter-label,
+a.lbx-meter:hover .lbx-meter-value {
+  color: var(--theme-body-link-hover-content-color);
+}
+
+.lbx-meter-value {
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.lbx-meter-track {
+  block-size: var(--lbx-meter-bar-height);
+  border-radius: var(--border-radius-xsmall, 0.125rem);
+  background-color: color-mix(in srgb, var(--theme-fill-color) 25%, transparent);
+  overflow: hidden;
+}
+
+.lbx-meter-fill {
+  display: block;
+  block-size: 100%;
+  /* Never let the smallest row vanish entirely. */
+  inline-size: max(var(--value, 0) * 100%, max(1px, 0.0625rem));
+  border-radius: inherit;
+  background-color: currentColor;
+}

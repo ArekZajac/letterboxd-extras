@@ -1,0 +1,63 @@
+/* Shared primitives. The section chrome itself (.section, .section-header,
+   .section-heading, .section-accessories, .accessory) is Letterboxd's. */
+
+.lbx-body {
+  font-family: var(--font-stack-graphik);
+}
+
+.lbx-status {
+  color: var(--theme-metadata-content-color);
+  font-size: 0.6875rem;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.lbx-status.-error,
+.lbx-status.-warning {
+  color: var(--theme-metadata-high-contrast-content-color);
+}
+
+.lbx-status.-warning {
+  margin-block-start: var(--spacing-dense-small);
+}
+
+.lbx-link,
+.lbx-action {
+  cursor: pointer;
+}
+
+.lbx-action.-disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.lbx-accessories {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-dense-medium);
+}
+
+/* Scale axis, used by Eras and by the ratings histogram. */
+.lbx-axis {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  color: var(--theme-rating-icon-color);
+  font-size: 0.625rem;
+  line-height: 1.25;
+}
+
+.lbx-axis.-ticked {
+  margin-block-start: var(--spacing-dense-small);
+}
+
+/* Midpoint mark: between 2.5 and 3 on a ten-bucket rating scale. */
+.lbx-axis-tick {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  inline-size: var(--border-width-thin, 1px);
+  block-size: 0.375rem;
+  background-color: var(--theme-metadata-content-color);
+}

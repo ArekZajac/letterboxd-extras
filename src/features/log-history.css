@@ -1,0 +1,128 @@
+.lbx-log-history {
+  /* A floor, not a fixed size: columns are 1fr and stretch to fill the section,
+     dropping to this minimum before the scroller takes over. */
+  --lbx-cell-min: 0.5rem;
+  --lbx-cell-gap: var(--border-width-thin, 1px);
+  --lbx-heat: var(--theme-brand-green-surface-color, #00ac1c);
+}
+
+.lbx-heat-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+/* One matrix shape for all four views: row 1 the column labels, column 1 the
+   row labels, the rest cells. */
+.lbx-heat-grid {
+  display: grid;
+  grid-template-columns: auto repeat(var(--cols, 53), minmax(var(--lbx-cell-min), 1fr));
+  grid-template-rows: auto repeat(var(--rows, 7), auto);
+  gap: var(--lbx-cell-gap);
+  align-items: center;
+}
+
+/* The rolled-up views have far fewer rows, so they stretch to the height the
+   day calendar measured instead of keeping cells square. */
+.lbx-heat-grid.-fill {
+  block-size: var(--lbx-heat-height, 5.5rem);
+  grid-template-rows: auto repeat(var(--rows, 3), minmax(0, 1fr));
+}
+
+.lbx-heat-grid.-fill .lbx-cell {
+  aspect-ratio: auto;
+  block-size: 100%;
+}
+
+.lbx-col-label,
+.lbx-row-label {
+  color: var(--theme-metadata-low-contrast-content-color);
+  font-size: 0.5625rem;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lbx-row-label {
+  padding-inline-end: 0.4em;
+  font-variant-numeric: tabular-nums;
+}
+
+.lbx-cell {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: var(--border-radius-xsmall, 0.125rem);
+  background-color: var(--lbx-level, transparent);
+}
+
+.lbx-cell.-outside {
+  background-color: transparent;
+}
+
+.lbx-cell.-l0 {
+  --lbx-level: color-mix(in srgb, var(--theme-fill-color) 35%, transparent);
+}
+.lbx-cell.-l1 {
+  --lbx-level: color-mix(in srgb, var(--lbx-heat) 30%, transparent);
+}
+.lbx-cell.-l2 {
+  --lbx-level: color-mix(in srgb, var(--lbx-heat) 50%, transparent);
+}
+.lbx-cell.-l3 {
+  --lbx-level: color-mix(in srgb, var(--lbx-heat) 75%, transparent);
+}
+.lbx-cell.-l4 {
+  --lbx-level: var(--lbx-heat);
+}
+
+a.lbx-cell {
+  transition-property: outline-color;
+  transition-duration: var(--transition-duration, var(--timing-duration-out));
+  transition-timing-function: var(--easing-default);
+  outline: var(--border-width-thin, 1px) solid transparent;
+  outline-offset: 1px;
+}
+
+a.lbx-cell:hover {
+  --transition-duration: var(--timing-duration-in);
+  outline-color: var(--theme-body-high-contrast-content-color);
+}
+
+a.lbx-cell:focus-visible {
+  outline: var(--focus-outline);
+}
+
+.lbx-heat-meta {
+  margin-block-start: var(--spacing-dense-small);
+  color: var(--theme-metadata-content-color);
+  font-size: 0.6875rem;
+  line-height: 1.25;
+}
+
+.lbx-streak {
+  cursor: help;
+}
+
+.lbx-year-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-dense-small);
+}
+
+/* Hidden by day/week/month/year; spelt out so it doesn't depend on a UA or
+   Letterboxd rule outranking the display above. */
+.lbx-year-nav[hidden] {
+  display: none;
+}
+
+.lbx-year-label {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chevrons are punctuation at the accessory size, so they get their own. */
+.lbx-step {
+  font-size: 1.125rem;
+  line-height: 1;
+  padding-inline: 0.15em;
+  text-decoration: none;
+}

@@ -1,0 +1,8 @@
+/* Mean rating beside the rated count: "64 | 3.4 avg". A real border rather than
+   a pipe character, so it sits on the text baseline box. */
+.lbx-average {
+  display: inline-block;
+  border-inline-start: var(--border-width-thin, 1px) solid currentColor;
+  margin-inline-start: 0.5em;
+  padding-inline-start: 0.5em;
+}

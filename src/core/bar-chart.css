@@ -1,0 +1,10 @@
+/* .rating-histogram defines bar heights as a percentage of the plot, so the
+   plot height is the one thing it needs from us. */
+.lbx-bar-chart .chart {
+  block-size: 4rem;
+  inline-size: 100%;
+}
+
+.lbx-bar-chart.-dense > .layout > .chart > .plot {
+  gap: 0;
+}
