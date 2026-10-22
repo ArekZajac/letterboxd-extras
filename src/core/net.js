@@ -52,7 +52,10 @@ export async function fetchText(path, { attempts = MAX_ATTEMPTS } = {}) {
     let res;
     await acquire();
     try {
-      res = await fetch(path, { credentials: "same-origin" });
+      // Everything read is public, and the viewer's account filters (hide
+      // short films, show films in watchlist, …) live in a cookie the server
+      // applies to every film grid, which would skew the counts.
+      res = await fetch(path, { credentials: "omit" });
     } catch (err) {
       lastError = err;
       continue;
