@@ -1,11 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Letterboxd Profile Extras",
-  "version": "1.0.0",
-  "description": "Adds extra analytics to Letterboxd profile pages.",
+  "version": "1.1.0",
+  "description": "Adds extra analytics to Letterboxd profile pages, and a film picker for watchlists.",
   "permissions": ["storage"],
   "host_permissions": ["https://letterboxd.com/*"],
   "content_scripts": [
+    {
+      "matches": ["https://letterboxd.com/*/watchlist/*"],
+      "js": ["src/early.js"],
+      "run_at": "document_start"
+    },
     {
       "matches": ["https://letterboxd.com/*"],
       "js": ["src/boot.js"],
@@ -17,7 +22,9 @@
         "src/features/eras.css",
         "src/features/log-history.css",
         "src/features/genres.css",
-        "src/features/hot-takes.css"
+        "src/features/hot-takes.css",
+        "src/features/nav-pick.css",
+        "src/features/picker.css"
       ],
       "run_at": "document_idle"
     }

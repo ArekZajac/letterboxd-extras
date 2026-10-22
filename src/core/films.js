@@ -31,7 +31,7 @@ function ownRating(item) {
   return rating > 0 ? rating : null;
 }
 
-function extractFilms(doc) {
+export function extractFilms(doc) {
   const rows = [];
 
   for (const item of doc.querySelectorAll("li.griditem, li.poster-container")) {

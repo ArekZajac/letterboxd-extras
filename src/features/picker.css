@@ -1,0 +1,70 @@
+/* The swap. early.js sets .lbx-picking before first paint when the URL ends in
+   #pick, so the watchlist's grid never flashes up first. */
+.lbx-picking .js-watchlist-main-content > :not(.lbx-picker) {
+  display: none;
+}
+
+:root:not(.lbx-picking) .lbx-picker {
+  display: none;
+}
+
+/* -p230 sets a 230px column, and three of those overflow the 670px main
+   column: (670 - two 10px gaps) / 3. */
+.lbx-picker .poster-grid > .grid.-p230 {
+  --poster-grid-col-size: 216px;
+}
+
+/* .poster-viewingdata right-aligns the same way for Hot Takes' deviation. */
+.lbx-picker .lbx-year {
+  float: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Native selects that read as accessories: .section-accessories .accessory
+   already sets the case, size and spacing on the span around each. */
+.lbx-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lbx-select > select {
+  appearance: none;
+  border: 0;
+  margin: 0;
+  padding: 0 1.1em 0 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  /* As wide as the chosen option, not the longest one. */
+  field-sizing: content;
+  cursor: pointer;
+}
+
+.lbx-select > select:focus-visible {
+  outline: var(--focus-outline);
+}
+
+.lbx-select > select:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.lbx-select > select > option {
+  color: initial;
+  text-transform: none;
+}
+
+.lbx-select::after {
+  content: "▾";
+  position: absolute;
+  inset-inline-end: 0;
+  pointer-events: none;
+}
+
+.lbx-select:hover,
+.lbx-select:focus-within {
+  color: var(--theme-body-link-hover-content-color);
+}

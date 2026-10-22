@@ -42,7 +42,15 @@ function release() {
   else inFlight -= 1;
 }
 
-export async function fetchText(path, { attempts = MAX_ATTEMPTS } = {}) {
+/**
+ * @param {object} [options]
+ * @param {"omit" | "same-origin"} [options.credentials] cookies are left off
+ *   by default: everything read is public, and the viewer's account filters
+ *   (hide short films, show films in watchlist, …) live in a cookie the server
+ *   applies to every film grid, which would skew the counts. Send them only to
+ *   read the signed-in member's own view of their own lists.
+ */
+export async function fetchText(path, { attempts = MAX_ATTEMPTS, credentials = "omit" } = {}) {
   let lastError;
 
   for (let attempt = 0; attempt < attempts; attempt++) {
@@ -52,10 +60,7 @@ export async function fetchText(path, { attempts = MAX_ATTEMPTS } = {}) {
     let res;
     await acquire();
     try {
-      // Everything read is public, and the viewer's account filters (hide
-      // short films, show films in watchlist, …) live in a cookie the server
-      // applies to every film grid, which would skew the counts.
-      res = await fetch(path, { credentials: "omit" });
+      res = await fetch(path, { credentials });
     } catch (err) {
       lastError = err;
       continue;
@@ -130,8 +135,8 @@ export async function pooled({ items, work, onProgress = () => {}, concurrency =
 }
 
 /** Walk every page of a paginated list, calling extract() on each. */
-export async function crawl({ pathFor, extract, onProgress = () => {}, pageCap = PAGE_CAP }) {
-  const first = await fetchDoc(pathFor(1));
+export async function crawl({ pathFor, extract, onProgress = () => {}, pageCap = PAGE_CAP, credentials }) {
+  const first = await fetchDoc(pathFor(1), { credentials });
   const lastPage = lastPageNumber(first);
   const total = Math.min(lastPage, pageCap);
 
@@ -144,7 +149,7 @@ export async function crawl({ pathFor, extract, onProgress = () => {}, pageCap =
 
   const { failed } = await pooled({
     items: pages,
-    work: async (page) => byPage.set(page, extract(await fetchDoc(pathFor(page)))),
+    work: async (page) => byPage.set(page, extract(await fetchDoc(pathFor(page), { credentials }))),
     // Page 1 is already in hand, hence the offset.
     onProgress: ({ done, failed: pageFailures }) =>
       onProgress({ done: done + 1, total, failed: pageFailures }),
@@ -154,4 +159,23 @@ export async function crawl({ pathFor, extract, onProgress = () => {}, pageCap =
   for (const page of pages) rows.push(...(byPage.get(page) ?? []));
 
   return { rows, pages: total, failed, truncated: lastPage > pageCap };
+}
+
+/**
+ * For lists whose paginator has only a Next link, such as /following/: with no
+ * page count to split between workers, the pages have to be read in turn.
+ */
+export async function walk({ path, extract, pageCap = PAGE_CAP }) {
+  const rows = [];
+  let next = path;
+  let pages = 0;
+
+  while (next && pages < pageCap) {
+    const doc = await fetchDoc(next);
+    rows.push(...extract(doc));
+    pages += 1;
+    next = doc.querySelector("a.next[href]")?.getAttribute("href");
+  }
+
+  return { rows, pages, truncated: !!next };
 }

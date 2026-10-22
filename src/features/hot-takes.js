@@ -11,9 +11,8 @@
  * average than to rise above it. Merged, the panel would be nothing but films
  * the member disliked.
  *
- * The posters are Letterboxd's own markup — .poster-grid > ul.grid.-p150 lays
- * out four 150px posters, .poster-viewingdata is the caption, .rating.rated-N
- * draws the stars from the site sprite (N is the rating doubled).
+ * The caption's .rating.rated-N draws the stars from the site sprite (N is the
+ * rating doubled).
  */
 
 import { cacheKey, cached } from "../core/cache.js";
@@ -21,11 +20,10 @@ import { el, plural, statusLine } from "../core/dom.js";
 import { filmTitle, loadFilms } from "../core/films.js";
 import { fetchText, pooled } from "../core/net.js";
 import { panel } from "../core/panel.js";
-import { withTooltip } from "../core/tooltip.js";
+import { posterFor, posterGrid, posterTile } from "../core/poster.js";
 
 const PER_SIDE = 4; // one row of the four-across poster grid
 const POSTER_WIDTH = 150; // matches .grid.-p150
-const POSTER_HEIGHT = 225;
 const MIN_COMMUNITY_RATINGS = 1000; // below this an average is noise
 const MEASURE_ALL_UPTO = 200; // rated films we'll just measure outright
 const SHORTLIST_PER_SIDE = 25; // candidates measured per side above that
@@ -39,13 +37,6 @@ async function communityRating(slug) {
     average: Number(average[1]),
     ratings: count ? Number(count[1].replace(/,/g, "")) : 0,
   };
-}
-
-/** Answers with a 255-byte {url, url2x} rather than the image itself. */
-async function posterFor(film) {
-  const base = film.link || `/film/${film.slug}/`;
-  const { url, url2x } = JSON.parse(await fetchText(`${base}poster/std/${POSTER_WIDTH}/`));
-  return { url, url2x };
 }
 
 /**
@@ -106,7 +97,7 @@ async function load(profile, onProgress, { force = false } = {}) {
       const shown = [...hotter.slice(0, PER_SIDE), ...colder.slice(0, PER_SIDE)];
       const { results: posters } = await pooled({
         items: shown,
-        work: async (film) => [film.slug, await posterFor(film)],
+        work: async (film) => [film.slug, await posterFor(film.link || `/film/${film.slug}/`, POSTER_WIDTH)],
         onProgress: ({ done, total }) => onProgress({ phase: "posters", done, total }),
       });
 
@@ -137,30 +128,6 @@ function stars(rating) {
 }
 
 function tile(take, profile) {
-  const poster = el("div", "poster film-poster");
-
-  if (take.poster?.url) {
-    const img = el("img", "image");
-    img.src = take.poster.url;
-    if (take.poster.url2x) img.srcset = `${take.poster.url2x} 2x`;
-    img.width = POSTER_WIDTH;
-    img.height = POSTER_HEIGHT;
-    img.alt = filmTitle(take.name);
-    img.loading = "lazy";
-    poster.appendChild(img);
-  } else {
-    poster.classList.add("no-poster");
-  }
-
-  const frame = el("a", "frame");
-  frame.href = profile.url(`film/${take.slug}/`);
-  frame.appendChild(el("span", "frame-title", take.name));
-  withTooltip(
-    frame,
-    `You ${take.rating} · crowd ${take.average.toFixed(2)} from ${plural(take.ratings, "rating", "ratings")}`
-  );
-  poster.appendChild(frame);
-
   // Two decimals: one rounds 1.04 and 0.96 to the same "+1.0".
   const gap = el(
     "span",
@@ -168,15 +135,15 @@ function tile(take, profile) {
     `${take.gap > 0 ? "+" : "−"}${Math.abs(take.gap).toFixed(2)}`
   );
 
-  const caption = el("p", "poster-viewingdata");
-  caption.append(stars(take.rating), gap);
-
-  const container = el("div", "viewing-poster-container");
-  container.append(poster, caption);
-
-  const item = el("li", "griditem");
-  item.appendChild(container);
-  return item;
+  return posterTile({
+    name: take.name,
+    alt: filmTitle(take.name),
+    href: profile.url(`film/${take.slug}/`),
+    poster: take.poster,
+    width: POSTER_WIDTH,
+    tooltip: `You ${take.rating} · crowd ${take.average.toFixed(2)} from ${plural(take.ratings, "rating", "ratings")}`,
+    caption: [stars(take.rating), gap],
+  });
 }
 
 function posterRow({ takes, heading, profile }) {
@@ -188,12 +155,7 @@ function posterRow({ takes, heading, profile }) {
     return row;
   }
 
-  const grid = el("ul", "grid -p150");
-  for (const take of takes) grid.appendChild(tile(take, profile));
-
-  const wrapper = el("div", "poster-grid");
-  wrapper.appendChild(grid);
-  row.appendChild(wrapper);
+  row.appendChild(posterGrid(takes.map((take) => tile(take, profile)), POSTER_WIDTH));
   return row;
 }
 
